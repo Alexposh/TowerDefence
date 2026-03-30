@@ -20,7 +20,7 @@ pg.display.set_caption("Tower Defence")
 # game variables 
 
 placing_turrets = False
-
+selected_turret = None
 #load images
 
 #map
@@ -58,12 +58,24 @@ def create_turret(pos):
         for turret in turret_group:
             if (mouse_pos) == (turret.pos): 
                 space_is_free = False
-                print('turret already there')
+                # print('turret already there')
         # if this a free space, create a turret 
         if space_is_free:
             new_turret = Turret(turret_sheet, mouse_pos)
             turret_group.add(new_turret)
-            print('new turret')
+            # print('new turret')
+
+def select_turret(mouse_pos):
+    mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
+    mouse_tile_y = mouse_pos[1] // c.TILE_SIZE
+    mouse_pos = (mouse_tile_x * c.TILE_SIZE + 32, mouse_tile_y * c.TILE_SIZE + 32)
+    for turret in turret_group:
+            if (mouse_pos) == (turret.pos): 
+                return turret
+
+def clear_selection():
+    for turret in turret_group:
+        turret.selected = False
 
 #create world
 world = World(world_data, map_image)
@@ -92,7 +104,11 @@ while run:
 
     # update groups
     enemy_group.update() 
-    turret_group.update()
+    turret_group.update(enemy_group)
+
+    # highlight selected turret 
+    if selected_turret:
+        selected_turret.selected = True
 
     ###################################
     # DRAWING SECTION 
@@ -108,7 +124,9 @@ while run:
 
     #draw groups
     enemy_group.draw(screen)
-    turret_group.draw(screen)
+    # turret_group.draw(screen)
+    for turret in turret_group:
+        turret.draw(screen)
 
     # draw buttons 
     # button for placing turrets
@@ -136,8 +154,13 @@ while run:
         if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
             mouse_pos = pg.mouse.get_pos()
             if mouse_pos[0] < c.SCREEN_WIDTH and mouse_pos[1] < c.SCREEN_HEIGHT:
+                # clear selected turrets
+                selected_turret = None
+                clear_selection()
                 if placing_turrets:
-                    create_turret(mouse_pos)                
+                    create_turret(mouse_pos)
+                else:
+                    selected_turret = select_turret(mouse_pos)              
 
     # update_display
     pg.display.flip()
