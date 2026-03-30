@@ -1,0 +1,24 @@
+COLS = 15
+ROWS = 15
+TILE_SIZE = 64
+SIDE_PANEL = 300
+
+SCREEN_WIDTH = TILE_SIZE * COLS  
+SCREEN_HEIGHT = TILE_SIZE * ROWS
+FPS = 60
+
+# 1	    64
+# 2 	128
+# 3	    192
+# 4 	256
+# 5 	320
+# 6 	384
+# 7 	448
+# 8 	512
+# 9	    576
+# 10	640
+# 11	704
+# 12	768
+# 13	832
+# 14	896
+# 15	960
