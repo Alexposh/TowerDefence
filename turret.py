@@ -1,15 +1,17 @@
 import pygame as pg
 import constants as c
 import math
+from turret_data import TURRET_DATA
 
 class Turret(pg.sprite.Sprite):
-    def __init__(self, sprite_sheet, pos):
+    def __init__(self, sprite_sheets, pos):
         pg.sprite.Sprite.__init__(self)
+        self.upgrade_level = 1
         self.pos = pos
         self.x = pos[0]
         self.y = pos[1]
-        self.range = 180
-        self.cooldown = 30
+        self.range = TURRET_DATA[self.upgrade_level - 1].get('range')
+        self.cooldown = TURRET_DATA[self.upgrade_level - 1].get('cooldown')
         self.last_shot = pg.time.get_ticks()
         self.selected = False
         self.target = None
@@ -18,8 +20,8 @@ class Turret(pg.sprite.Sprite):
 
 
         # animation variables
-        self.sprite_sheet = sprite_sheet
-        self.animation_list = self.load_images()
+        self.sprite_sheets = sprite_sheets
+        self.animation_list = self.load_images(self.sprite_sheets[self.upgrade_level - 1])
         self.frame_index = 0
         self.update_time = pg.time.get_ticks()
 
@@ -31,7 +33,7 @@ class Turret(pg.sprite.Sprite):
         self.rect.center = pos
         
 
-        # create transparent circle showeing image
+        # create transparent circle showing image
         self.range_image = pg.Surface((self.range * 2, self.range * 2))
         self.range_image.fill((0,0,0))
         self.range_image.set_colorkey((0,0,0))
@@ -42,12 +44,12 @@ class Turret(pg.sprite.Sprite):
     
 
 
-    def load_images(self):
+    def load_images(self, sprite_sheet):
         # extract images from spritesheet
-        size = self.sprite_sheet.get_height()
+        size = sprite_sheet.get_height()
         animation_list = []
         for x in range(c.ANIMATION_STEPS):
-            temp_img = self.sprite_sheet.subsurface(x * size, 0, size, size)
+            temp_img = sprite_sheet.subsurface(x * size, 0, size, size)
             animation_list.append(temp_img)
         return animation_list
 
@@ -90,6 +92,23 @@ class Turret(pg.sprite.Sprite):
                 self.last_shot = pg.time.get_ticks()
                 self.target = None
 
+    def upgrade(self):
+        # """Upgrade the turret to the next level. This will increase the damage and range of the turret."""
+        self.upgrade_level += 1
+        self.range = TURRET_DATA[self.upgrade_level - 1].get('range')
+        self.cooldown = TURRET_DATA[self.upgrade_level - 1].get('cooldown')
+        # upgrade turret image
+        self.animation_list = self.load_images(self.sprite_sheets[self.upgrade_level - 1])
+        self.original_image = self.animation_list[self.frame_index]
+
+        # upgrade range circle showing image
+        self.range_image = pg.Surface((self.range * 2, self.range * 2))
+        self.range_image.fill((0,0,0))
+        self.range_image.set_colorkey((0,0,0))
+        pg.draw.circle(self.range_image, "grey100", (self.range, self.range), self.range)
+        self.range_image.set_alpha(100)
+        self.range_rect = self.range_image.get_rect()
+        self.range_rect.center = self.rect.center
 
     def draw(self, surface):
         self.image = pg.transform.rotate(self.original_image, self.angle - 90)
