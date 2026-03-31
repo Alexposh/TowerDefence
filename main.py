@@ -27,7 +27,7 @@ selected_turret = None
 map_image = pg.image.load('assests/levels/level.png').convert_alpha() 
 
 # turret spritesheet
-turret_sheet = pg.image.load('assests/turrets/turret_set_fire.png').convert_alpha()
+turret_sheet = pg.image.load('assests/turrets/turret_set2_fire.png').convert_alpha()
 
 #individual turret image for mouse cursor
 cursor_turret = pg.image.load('assests/turrets/turret1.png').convert_alpha()

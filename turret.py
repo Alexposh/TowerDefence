@@ -8,8 +8,8 @@ class Turret(pg.sprite.Sprite):
         self.pos = pos
         self.x = pos[0]
         self.y = pos[1]
-        self.range = 280
-        self.cooldown = 1500
+        self.range = 180
+        self.cooldown = 30
         self.last_shot = pg.time.get_ticks()
         self.selected = False
         self.target = None
@@ -77,17 +77,17 @@ class Turret(pg.sprite.Sprite):
     def play_animation(self):
         # update image
         self.original_image = self.animation_list[self.frame_index]
-        self.frame_index += 1
+        
         # check if enought ime has passed saince the last update
         if pg.time.get_ticks() - self.update_time > c.ANIMATION_DELAY:
             self.update_time = pg.time.get_ticks()
-            # self.frame_index += 1
+            self.frame_index += 1
             # check if the animation has finished and reset to idle
             if self.frame_index >= len(self.animation_list):
                 self.frame_index = 0
                 # record completed time and clear target so cooldown can begin
 
-                # self.last_shot = pg.time.get_ticks()
+                self.last_shot = pg.time.get_ticks()
                 self.target = None
 
 
