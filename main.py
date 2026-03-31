@@ -30,7 +30,7 @@ map_image = pg.image.load('assests/levels/level.png').convert_alpha()
 turret_sheet = pg.image.load('assests/turrets/turret_set2_fire.png').convert_alpha()
 
 #individual turret image for mouse cursor
-cursor_turret = pg.image.load('assests/turrets/turret1.png').convert_alpha()
+cursor_turret = pg.image.load('assests/turrets/turret.png').convert_alpha()
 
 #enemies
 enemy_image = pg.image.load('assests/images/enemies/enemy_1.png').convert_alpha()
