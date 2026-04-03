@@ -30,7 +30,7 @@ map_image = pg.image.load('assests/levels/level.png').convert_alpha()
 turret_spritesheets = []
 
 for x in range(1, c.TURRET_LEVELS + 1):
-    turret_sheet = pg.image.load(f'assests/turrets/a8x1_{x}.png').convert_alpha()
+    turret_sheet = pg.image.load(f'assests/turrets/blue_lvl{x}.png').convert_alpha()
     turret_spritesheets.append(turret_sheet)
 # turret_sheet = pg.image.load('assests/turrets/turret_set2_fire.png').convert_alpha()
 
