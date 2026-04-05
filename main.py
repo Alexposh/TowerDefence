@@ -30,15 +30,25 @@ map_image = pg.image.load('assests/levels/level.png').convert_alpha()
 turret_spritesheets = []
 
 for x in range(1, c.TURRET_LEVELS + 1):
-    turret_sheet = pg.image.load(f'assests/turrets/blue_lvl{x}.png').convert_alpha()
+    turret_sheet = pg.image.load(f'assests/turrets/red_lvl{x}.png').convert_alpha()
     turret_spritesheets.append(turret_sheet)
 # turret_sheet = pg.image.load('assests/turrets/turret_set2_fire.png').convert_alpha()
 
 #individual turret image for mouse cursor
-cursor_turret = pg.image.load('assests/turrets/a1.png').convert_alpha()
+cursor_turret = pg.image.load('assests/turrets/r1.png').convert_alpha()
+
 
 #enemies
+enemy_images = {
+    "weak":  pg.image.load('assests/images/enemies/enemy_1.png').convert_alpha(),
+    "medium":pg.image.load('assests/images/enemies/enemy_2.png').convert_alpha(),
+    "strong":pg.image.load('assests/images/enemies/enemy_3.png').convert_alpha(),
+    "elite": pg.image.load('assests/images/enemies/enemy_4.png').convert_alpha()
+
+}
+
 enemy_image = pg.image.load('assests/images/enemies/enemy_1.png').convert_alpha()
+
 
 # buttons
 buy_turret_image = pg.image.load('assests/images/buttons/buy.png').convert_alpha()
@@ -92,7 +102,8 @@ world.process_data()
 enemy_group = pg.sprite.Group()
 turret_group = pg.sprite.Group()
 
-enemy = Enemy(world.waypoints, enemy_image)
+enemy_type= "weak" 
+enemy = Enemy(enemy_type, world.waypoints, enemy_images)
 enemy_group.add(enemy)
 
 # create Button
