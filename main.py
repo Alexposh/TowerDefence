@@ -18,7 +18,7 @@ pg.display.set_caption("Tower Defence")
 
 
 # game variables 
-
+last_enemy_spawn = pg.time.get_ticks()
 placing_turrets = False
 selected_turret = None
 #load images
@@ -60,11 +60,21 @@ upgrade_turret_image = pg.image.load('assests/images/buttons/upgrade.png').conve
 with open('assests/levels/mapdata1.tmj') as file:
     world_data = json.load(file)
 
+# load fonts for displaying text on the screen
+text_font = pg.font.SysFont("Consolas", 24, bold=True)
+large_font = pg.font.SysFont("Consolas", 36)
+
+# function for outputting text onto the screen
+def draw_text(text, font, text_col, x, y):
+    img = font.render(text, True, text_col)
+    screen.blit(img,(x,y))
+
+
 def create_turret(pos):
     mouse_tile_x = pos[0] // c.TILE_SIZE
     mouse_tile_y = pos[1] // c.TILE_SIZE
     mouse_pos = (mouse_tile_x * c.TILE_SIZE + 32, mouse_tile_y * c.TILE_SIZE + 32)
-    # print(mouse_pos[0])
+
     # calculate the sequential number of tiles 
     mouse_tile_num = (mouse_tile_y * c.COLS) + mouse_tile_x
 
@@ -75,12 +85,15 @@ def create_turret(pos):
         for turret in turret_group:
             if (mouse_pos) == (turret.pos): 
                 space_is_free = False
-                # print('turret already there')
+                
         # if this a free space, create a turret 
         if space_is_free:
             new_turret = Turret(turret_spritesheets, mouse_pos)
             turret_group.add(new_turret)
-            # print('new turret')
+            # DEDUCT COST OF Turret
+            world.money -= c.BUY_COST
+
+          
 
 def select_turret(mouse_pos):
     mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
@@ -97,14 +110,13 @@ def clear_selection():
 #create world
 world = World(world_data, map_image)
 world.process_data()
+world.process_enemies()
 
 # create groups
 enemy_group = pg.sprite.Group()
 turret_group = pg.sprite.Group()
 
-enemy_type= "weak" 
-enemy = Enemy(enemy_type, world.waypoints, enemy_images)
-enemy_group.add(enemy)
+
 
 # create Button
 turret_button = Button(c.SCREEN_WIDTH + 50, 100, buy_turret_image, True)
@@ -121,7 +133,7 @@ while run:
     ###################################
 
     # update groups
-    enemy_group.update() 
+    enemy_group.update(world) 
     turret_group.update(enemy_group)
 
     # highlight selected turret 
@@ -134,6 +146,7 @@ while run:
     
     screen.fill("grey100") 
 
+
     # draw level
     world.draw(screen)
 
@@ -145,6 +158,18 @@ while run:
     # turret_group.draw(screen)
     for turret in turret_group:
         turret.draw(screen)
+
+    draw_text(str(world.health), text_font, "black", c.SCREEN_WIDTH + 150,450)
+    draw_text(str(world.money), text_font, "black", c.SCREEN_WIDTH + 150,490)
+
+    #spawn enemies
+    if pg.time.get_ticks() - last_enemy_spawn > c.SPAWN_COOLDOWN:
+        if world.spawned_enemies < len(world.enemy_list):
+            enemy_type= world.enemy_list[world.spawned_enemies] 
+            enemy = Enemy(enemy_type, world.waypoints, enemy_images)
+            enemy_group.add(enemy)
+            world.spawned_enemies += 1
+            last_enemy_spawn = pg.time.get_ticks()
 
     # draw buttons 
     # button for placing turrets
@@ -168,8 +193,9 @@ while run:
         # IF A TURRET CAN BE UPGRADED, ONLY THEN SHO THE UPGRADE BUTTON
         if selected_turret.upgrade_level < c.TURRET_LEVELS:
             if upgrade_button.draw(screen):
-                selected_turret.upgrade()
-
+                if world.money >= c.UPGRADE_COST:
+                    selected_turret.upgrade()
+                    world.money -= c.UPGRADE_COST
 
     # Event handler
     for event in  pg.event.get():
@@ -184,7 +210,9 @@ while run:
                 selected_turret = None
                 clear_selection()
                 if placing_turrets:
-                    create_turret(mouse_pos)
+                    # check if there is enough money to buy a turret  
+                    if world.money >= c.BUY_COST:
+                        create_turret(mouse_pos)
                 else:
                     selected_turret = select_turret(mouse_pos)              
 
