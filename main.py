@@ -19,6 +19,7 @@ pg.display.set_caption("Tower Defence")
 
 # game variables 
 last_enemy_spawn = pg.time.get_ticks()
+level_started = False
 placing_turrets = False
 selected_turret = None
 #load images
@@ -54,7 +55,7 @@ enemy_image = pg.image.load('assests/images/enemies/enemy_1.png').convert_alpha(
 buy_turret_image = pg.image.load('assests/images/buttons/buy.png').convert_alpha()
 cancel_image = pg.image.load('assests/images/buttons/cancel.png').convert_alpha()
 upgrade_turret_image = pg.image.load('assests/images/buttons/upgrade.png').convert_alpha()
-
+begin_image = pg.image.load('assests/images/buttons/begin.png').convert_alpha()
 
 #load jon data for level
 with open('assests/levels/mapdata1.tmj') as file:
@@ -118,10 +119,11 @@ turret_group = pg.sprite.Group()
 
 
 
-# create Button
+# create Buttons
 turret_button = Button(c.SCREEN_WIDTH + 50, 100, buy_turret_image, True)
 cancel_button = Button(c.SCREEN_WIDTH + 50, 180, cancel_image, True)
 upgrade_button = Button(c.SCREEN_WIDTH + 50, 260, upgrade_turret_image, True)
+begin_button = Button(c.SCREEN_WIDTH + 50, 360, begin_image, True)
 
 run = True
 while run:
@@ -162,14 +164,19 @@ while run:
     draw_text(str(world.health), text_font, "black", c.SCREEN_WIDTH + 150,450)
     draw_text(str(world.money), text_font, "black", c.SCREEN_WIDTH + 150,490)
 
-    #spawn enemies
-    if pg.time.get_ticks() - last_enemy_spawn > c.SPAWN_COOLDOWN:
-        if world.spawned_enemies < len(world.enemy_list):
-            enemy_type= world.enemy_list[world.spawned_enemies] 
-            enemy = Enemy(enemy_type, world.waypoints, enemy_images)
-            enemy_group.add(enemy)
-            world.spawned_enemies += 1
-            last_enemy_spawn = pg.time.get_ticks()
+    # check if the level has been started or not
+    if level_started == False:
+        if begin_button.draw(screen):
+            level_started = True
+    else:
+        #spawn enemies
+        if pg.time.get_ticks() - last_enemy_spawn > c.SPAWN_COOLDOWN:
+            if world.spawned_enemies < len(world.enemy_list):
+                enemy_type= world.enemy_list[world.spawned_enemies] 
+                enemy = Enemy(enemy_type, world.waypoints, enemy_images)
+                enemy_group.add(enemy)
+                world.spawned_enemies += 1
+                last_enemy_spawn = pg.time.get_ticks()
 
     # draw buttons 
     # button for placing turrets
